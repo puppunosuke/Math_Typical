@@ -1,0 +1,341 @@
+/* ============================================================
+   Math_Typical - スタイル
+   ダーク系、ミニマル、スマホ優先（max-width: 720px）
+   ============================================================ */
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #0e0e10;
+  --panel: #1a1a20;
+  --border: #2a2a32;
+  --border-lite: #3a3a44;
+  --text: #cfcfd6;
+  --text-mid: #8a8a92;
+  --gold: #ffd866;
+  --green: #6ee7b7;
+  --blue: #6ee7ff;
+  --red: #f87171;
+  --purple: #c084fc;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", sans-serif;
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1rem 1.2rem 4rem;
+}
+
+/* ===== ヘッダー ===== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.app-title {
+  font-size: 1.1rem;
+  color: var(--gold);
+  margin: 0;
+  font-weight: 600;
+}
+.account-btn {
+  background: transparent;
+  border: 1px solid var(--border-lite);
+  color: var(--gold);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.account-btn:hover { background: rgba(255, 216, 102, 0.1); }
+
+/* ===== ビュー切替 ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== パンくず ===== */
+.crumb {
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  margin-bottom: 0.8rem;
+}
+.crumb a {
+  color: var(--blue);
+  text-decoration: none;
+  cursor: pointer;
+}
+.crumb a:hover { text-decoration: underline; }
+
+/* ===== セクション見出し ===== */
+.section-title {
+  font-size: 1rem;
+  color: var(--gold);
+  margin: 1.2rem 0 0.6rem;
+  font-weight: 600;
+}
+
+/* ===== 単元一覧 ===== */
+.chapter-list {
+  display: grid;
+  gap: 0.5rem;
+}
+.chapter-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.15s;
+}
+.chapter-card:hover { border-color: var(--gold); }
+.chapter-name {
+  font-size: 0.95rem;
+  flex: 1;
+}
+.chapter-meta {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* ===== フィルター ===== */
+.filter-bar {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.filter-label {
+  color: var(--text-mid);
+  margin-right: 0.3rem;
+}
+.chip {
+  background: transparent;
+  border: 1px solid var(--border-lite);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+.chip.active {
+  background: var(--gold);
+  color: #1a1a20;
+  border-color: var(--gold);
+}
+
+/* ===== 問題一覧 ===== */
+.problem-list {
+  display: grid;
+  gap: 0.4rem;
+}
+.problem-row {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  transition: border-color 0.15s;
+}
+.problem-row:hover { border-color: var(--gold); }
+.problem-n {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: 3.2rem;
+}
+.problem-tags {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--text-mid);
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.status-icon {
+  font-size: 0.9rem;
+}
+
+/* ステータスごとの色付け（行の左ボーダー） */
+.problem-row[data-status="untouched"] { border-left: 3px solid var(--border-lite); }
+.problem-row[data-status="solved"]    { border-left: 3px solid var(--green); }
+.problem-row[data-status="review"]    { border-left: 3px solid var(--purple); }
+.problem-row[data-status="mastered"]  { border-left: 3px solid var(--gold); }
+
+/* ===== 問題詳細 ===== */
+.problem-meta {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  margin-bottom: 0.6rem;
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.problem-image {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.status-bar {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.status-btn {
+  flex: 1;
+  min-width: 5rem;
+  background: var(--panel);
+  border: 1px solid var(--border-lite);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.status-btn.active[data-status="untouched"] { background: var(--border-lite); color: #fff; }
+.status-btn.active[data-status="solved"]    { background: var(--green); color: #1a1a20; }
+.status-btn.active[data-status="review"]    { background: var(--purple); color: #fff; }
+.status-btn.active[data-status="mastered"]  { background: var(--gold); color: #1a1a20; }
+
+.memo-section { margin-top: 1rem; }
+.memo-section h3 {
+  font-size: 0.9rem;
+  color: var(--gold);
+  margin: 0 0 0.5rem;
+}
+.memo-input {
+  width: 100%;
+  min-height: 4rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 0.6rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+.memo-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.btn {
+  background: var(--panel);
+  border: 1px solid var(--border-lite);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.btn:hover { background: #26262e; }
+.btn.primary { background: var(--gold); color: #1a1a20; border-color: var(--gold); }
+.btn.primary:hover { background: #ffe089; }
+
+.memo-history {
+  margin-top: 1rem;
+}
+.memo-history details {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+}
+.memo-history summary {
+  cursor: pointer;
+  color: var(--text-mid);
+  font-size: 0.85rem;
+}
+.memo-entry {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
+}
+.memo-entry .at {
+  color: var(--text-mid);
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+.memo-entry .text { white-space: pre-wrap; }
+
+/* ===== 解答モーダル ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+.modal-backdrop.active { display: flex; }
+.modal-content {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+}
+.modal-close {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: var(--panel);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--gold);
+  padding: 0.6rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-align: right;
+}
+.answer-image {
+  width: 100%;
+  background: #fff;
+}
+
+/* ===== ログイン画面 ===== */
+.login-panel {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+.login-panel h2 { color: var(--gold); }
+.login-panel p { color: var(--text-mid); }
+
+.hidden { display: none !important; }

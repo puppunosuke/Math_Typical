@@ -4,27 +4,87 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Math_Typical</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: #0e0e10;
-      color: #cfcfd6;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-      line-height: 1.6;
-      text-align: center;
-    }
-    h1 { color: #ffd866; }
-    a { color: #6ee7ff; }
-    .note { color: #8a8a92; font-size: 0.9rem; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>📚 Math_Typical</h1>
-  <p>高校数学の問題集 学習補助アプリ</p>
-  <p class="note">準備中（Phase 3 でアプリ実装予定）</p>
-  <hr style="border-color: #2a2a32; margin: 2rem 0;">
-  <p><a href="./upload.html">📤 画像アップロード（初期セットアップ用）</a></p>
+  <div class="app">
+    <header class="app-header">
+      <h1 class="app-title">📚 Math_Typical</h1>
+      <button id="accountBtn" class="account-btn" title="アカウント" type="button">
+        <span id="accountStatus">🔑</span>
+      </button>
+    </header>
+
+    <!-- 未ログイン時に表示 -->
+    <section id="loginView" class="view login-panel">
+      <h2>ログインしてね</h2>
+      <p>進捗・メモはクラウド同期。<br>Google アカウントでログインしてください。</p>
+      <button id="loginBtn" class="btn primary">Googleでログイン</button>
+    </section>
+
+    <!-- 単元一覧 -->
+    <section id="chaptersView" class="view">
+      <p class="crumb">単元一覧</p>
+      <h2 class="section-title">全12単元（250問）</h2>
+      <div id="chapterList" class="chapter-list"></div>
+    </section>
+
+    <!-- 問題一覧 -->
+    <section id="problemsView" class="view">
+      <p class="crumb"><a id="backToChapters">← 単元一覧</a></p>
+      <h2 id="problemsTitle" class="section-title"></h2>
+      <div class="filter-bar">
+        <span class="filter-label">難易度:</span>
+        <button class="chip" data-filter="difficulty" data-value="1">★☆☆</button>
+        <button class="chip" data-filter="difficulty" data-value="2">★★☆</button>
+        <button class="chip" data-filter="difficulty" data-value="3">★★★</button>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">範囲:</span>
+        <button class="chip" data-filter="audience" data-value="文理共通">文理共通</button>
+        <button class="chip" data-filter="audience" data-value="理系のみ">理系のみ</button>
+      </div>
+      <div id="problemList" class="problem-list"></div>
+    </section>
+
+    <!-- 問題詳細 -->
+    <section id="detailView" class="view">
+      <p class="crumb"><a id="backToProblems">← 問題一覧</a></p>
+      <h2 id="detailTitle" class="section-title"></h2>
+      <div id="detailMeta" class="problem-meta"></div>
+
+      <img id="detailImage" class="problem-image" alt="問題画像">
+
+      <div class="status-bar">
+        <button class="status-btn" data-status="untouched">未着手</button>
+        <button class="status-btn" data-status="solved">解いた</button>
+        <button class="status-btn" data-status="review">復習中</button>
+        <button class="status-btn" data-status="mastered">マスター</button>
+      </div>
+
+      <button id="showAnswerBtn" class="btn primary" style="width:100%;">📖 解答を見る</button>
+
+      <div class="memo-section">
+        <h3>メモ</h3>
+        <textarea id="memoInput" class="memo-input" placeholder="計算過程・つまずいた点・気づきなど..."></textarea>
+        <div class="memo-actions">
+          <button id="memoSaveBtn" class="btn primary">メモを保存</button>
+          <button id="memoToggleHistoryBtn" class="btn">過去のメモを見る</button>
+        </div>
+        <div id="memoHistory" class="memo-history hidden"></div>
+      </div>
+    </section>
+
+    <!-- 解答モーダル -->
+    <div id="answerModal" class="modal-backdrop">
+      <div class="modal-content">
+        <button class="modal-close" id="closeAnswerBtn">✕ 閉じる</button>
+        <img id="answerImage" class="answer-image" alt="解答画像">
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-init.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
