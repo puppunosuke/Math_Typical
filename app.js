@@ -28,9 +28,22 @@ let currentChapter = null; // 開いている単元 ID
 let currentProblemN = null; // 開いている問題番号
 
 // 画像URLのローカルキャッシュ。subpath → URL を localStorage に永続化。
-// getDownloadURL のトークンは長期間有効なので、ページリロード後も再利用できる。
-// ユーザー切替時にクリアするため、uid もキーに含める。
+// 注意: Firebase Storage はファイル上書き時にダウンロードトークンが新しくなる場合があり、
+//       古い URL がキャッシュされていると 403/404 で読めなくなる。
+//       画像を再アップロードしたタイミングで CACHE_VERSION を上げて自動クリアする。
 const URL_CACHE_KEY = "math_typical_image_urls";
+const CACHE_VERSION_KEY = "math_typical_cache_version";
+const CACHE_VERSION = "v2";  // 画像を再生成・再アップロードするたびに上げる
+
+(function ensureCacheVersion() {
+  const v = localStorage.getItem(CACHE_VERSION_KEY);
+  if (v !== CACHE_VERSION) {
+    localStorage.removeItem(URL_CACHE_KEY);
+    localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
+    console.log(`[Math_Typical] 画像キャッシュをクリアしました（v=${v} → ${CACHE_VERSION}）`);
+  }
+})();
+
 let imageURLCache = (() => {
   try { return new Map(Object.entries(JSON.parse(localStorage.getItem(URL_CACHE_KEY) || "{}"))); }
   catch { return new Map(); }
