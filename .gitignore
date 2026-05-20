@@ -1,0 +1,6 @@
+.DS_Store
+*.log
+node_modules/
+
+# 著作権上、PDF 由来の画像はリポに含めない（本人専用、Firebase Storage で管理）
+images/
