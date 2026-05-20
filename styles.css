@@ -206,8 +206,8 @@ html, body {
   flex-wrap: wrap;
 }
 
-/* 問題画像コンテナ。max-height で大きすぎる画像を抑える＋
-   タップで全体表示モーダルを出すための clickable */
+/* 問題画像コンテナ。画像は前処理で個別トリミング済みなので、
+   ここでは max-height などの裁断は入れない（問題ごとに丁度よいサイズで届く）。 */
 .problem-image-wrap {
   position: relative;
   background: #fff;
@@ -215,26 +215,11 @@ html, body {
   border-radius: 8px;
   margin-bottom: 1rem;
   overflow: hidden;
-  max-height: 70vh;
   cursor: zoom-in;
 }
 .problem-image-wrap img {
   width: 100%;
   display: block;
-  /* ページ下部の余白を物理的に隠す（PDF の下20%は余白とフッターが大半） */
-  margin-bottom: -16%;
-}
-.problem-image-wrap::after {
-  content: "🔍 タップで全体表示";
-  position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
-  font-size: 0.7rem;
-  color: var(--text-mid);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  pointer-events: none;
 }
 
 .status-bar {
