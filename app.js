@@ -244,20 +244,35 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// ===== 解答モーダル =====
+// ===== 解答モーダル（複数ページ対応）=====
 async function onShowAnswer() {
   if (currentProblemN == null) return;
   const p = problems.find(x => x.n === currentProblemN);
   if (!p.answer_page) return;
   const modal = document.getElementById("answerModal");
-  const img = document.getElementById("answerImage");
-  img.src = "";
-  img.alt = "読み込み中...";
+  const container = document.getElementById("answerImagesContainer");
+  container.innerHTML = `<p style="padding:1rem; color:var(--text-mid)">読み込み中...</p>`;
   modal.classList.add("active");
-  try {
-    img.src = await getImageURL(`answers/page-${String(p.answer_page).padStart(3, "0")}.jpg`);
-  } catch (err) {
-    img.alt = "画像取得エラー: " + err.message;
+
+  // answer_page 〜 answer_end_page の画像を順に並べる
+  const start = p.answer_page;
+  const end = p.answer_end_page ?? p.answer_page;
+  container.innerHTML = "";
+  for (let pg = start; pg <= end; pg++) {
+    const subpath = `answers/page-${String(pg).padStart(3, "0")}.jpg`;
+    const img = document.createElement("img");
+    img.className = "answer-image";
+    img.alt = `解答 P${pg}`;
+    container.appendChild(img);
+    try {
+      img.src = await getImageURL(subpath);
+    } catch (err) {
+      const errP = document.createElement("p");
+      errP.style.padding = "0.5rem";
+      errP.style.color = "var(--red)";
+      errP.textContent = `画像エラー (P${pg}): ${err.message}`;
+      img.replaceWith(errP);
+    }
   }
 }
 

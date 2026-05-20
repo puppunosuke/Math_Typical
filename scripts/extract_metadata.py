@@ -114,11 +114,29 @@ def main():
 
     output = sorted(problems.values(), key=lambda p: p['n'])
 
+    # 解答の終了ページを計算: 次の問題の解答開始ページ - 1
+    # 最後の問題は解答編の最終ページ（旧PDF の P491、おまけ P492 の前）まで
+    ANSWER_SECTION_END = 491
+    for i, p in enumerate(output):
+        if i + 1 < len(output):
+            next_start = output[i + 1]['answer_page']
+            p['answer_end_page'] = next_start - 1 if next_start else None
+        else:
+            p['answer_end_page'] = ANSWER_SECTION_END
+
     # 検証: 抽出した問題数と未紐付け（解答ページ無し）の確認
     print(f'  → 抽出した問題数: {len(output)}', file=sys.stderr)
     unmatched = [p for p in output if p['answer_page'] is None]
     if unmatched:
         print(f'  ⚠ 解答ページ未紐付け: {len(unmatched)} 問 (例: 問題{unmatched[0]["n"]})', file=sys.stderr)
+
+    # 解答ページ数の分布を出力（参考情報）
+    span_counts = {}
+    for p in output:
+        if p['answer_page'] and p['answer_end_page']:
+            span = p['answer_end_page'] - p['answer_page'] + 1
+            span_counts[span] = span_counts.get(span, 0) + 1
+    print(f'  → 解答ページ数分布: {dict(sorted(span_counts.items()))}', file=sys.stderr)
 
     # 出力
     out_path = Path(__file__).parent.parent / 'data' / 'problems.json'
