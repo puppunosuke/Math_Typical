@@ -53,7 +53,9 @@
       <h2 id="detailTitle" class="section-title"></h2>
       <div id="detailMeta" class="problem-meta"></div>
 
-      <img id="detailImage" class="problem-image" alt="問題画像">
+      <div id="problemImageWrap" class="problem-image-wrap">
+        <img id="detailImage" alt="問題画像">
+      </div>
 
       <div class="status-bar">
         <button class="status-btn" data-status="untouched">未着手</button>
@@ -80,6 +82,14 @@
       <div class="modal-content">
         <button class="modal-close" id="closeAnswerBtn">✕ 閉じる</button>
         <div id="answerImagesContainer"></div>
+      </div>
+    </div>
+
+    <!-- 問題画像の全体表示モーダル（max-height で見切れた分も全部見れる）-->
+    <div id="fullImageModal" class="modal-backdrop">
+      <div class="modal-content">
+        <button class="modal-close" id="closeFullImageBtn">✕ 閉じる</button>
+        <img id="fullImage" class="full-image" alt="問題画像（全体）">
       </div>
     </div>
   </div>

@@ -26,7 +26,19 @@ const DIFFICULTY_LABEL = { 1: "★☆☆", 2: "★★☆", 3: "★★★" };
 let problems = [];     // problems.json の中身
 let currentChapter = null; // 開いている単元 ID
 let currentProblemN = null; // 開いている問題番号
-let imageURLCache = new Map(); // subpath → DataURL（Storage 取得結果のキャッシュ）
+
+// 画像URLのローカルキャッシュ。subpath → URL を localStorage に永続化。
+// getDownloadURL のトークンは長期間有効なので、ページリロード後も再利用できる。
+// ユーザー切替時にクリアするため、uid もキーに含める。
+const URL_CACHE_KEY = "math_typical_image_urls";
+let imageURLCache = (() => {
+  try { return new Map(Object.entries(JSON.parse(localStorage.getItem(URL_CACHE_KEY) || "{}"))); }
+  catch { return new Map(); }
+})();
+function saveURLCache() {
+  const obj = Object.fromEntries(imageURLCache);
+  try { localStorage.setItem(URL_CACHE_KEY, JSON.stringify(obj)); } catch {}
+}
 
 // --- ビュー切替 ---
 const VIEWS = ["loginView", "chaptersView", "problemsView", "detailView"];
@@ -42,13 +54,16 @@ async function loadProblems() {
   problems = await res.json();
 }
 
-// --- 画像URL取得（メモリキャッシュ付き）---
+// --- 画像URL取得（localStorage キャッシュ付き）---
+// 一度取得した URL は同じ session/uid であれば再利用。リロード後も有効。
 async function getImageURL(subpath) {
-  if (imageURLCache.has(subpath)) return imageURLCache.get(subpath);
   const user = getUser();
   if (!user) return null;
+  const cacheKey = `${user.uid}:${subpath}`;
+  if (imageURLCache.has(cacheKey)) return imageURLCache.get(cacheKey);
   const url = await window.MathTypical.firebase.getImageURL(user.uid, subpath);
-  imageURLCache.set(subpath, url);
+  imageURLCache.set(cacheKey, url);
+  saveURLCache();
   return url;
 }
 
@@ -244,7 +259,7 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// ===== 解答モーダル（複数ページ対応）=====
+// ===== 解答モーダル（複数ページ並列取得）=====
 async function onShowAnswer() {
   if (currentProblemN == null) return;
   const p = problems.find(x => x.n === currentProblemN);
@@ -254,26 +269,46 @@ async function onShowAnswer() {
   container.innerHTML = `<p style="padding:1rem; color:var(--text-mid)">読み込み中...</p>`;
   modal.classList.add("active");
 
-  // answer_page 〜 answer_end_page の画像を順に並べる
   const start = p.answer_page;
   const end = p.answer_end_page ?? p.answer_page;
+  const pages = [];
+  for (let pg = start; pg <= end; pg++) pages.push(pg);
+
+  // 全URLを並列で取得（複数ページの解答が一気に表示される）
+  const results = await Promise.allSettled(
+    pages.map(pg => getImageURL(`answers/page-${String(pg).padStart(3, "0")}.jpg`))
+  );
+
   container.innerHTML = "";
-  for (let pg = start; pg <= end; pg++) {
-    const subpath = `answers/page-${String(pg).padStart(3, "0")}.jpg`;
-    const img = document.createElement("img");
-    img.className = "answer-image";
-    img.alt = `解答 P${pg}`;
-    container.appendChild(img);
-    try {
-      img.src = await getImageURL(subpath);
-    } catch (err) {
+  results.forEach((r, i) => {
+    const pg = pages[i];
+    if (r.status === "fulfilled") {
+      const img = document.createElement("img");
+      img.className = "answer-image";
+      img.alt = `解答 P${pg}`;
+      img.src = r.value;
+      container.appendChild(img);
+    } else {
       const errP = document.createElement("p");
       errP.style.padding = "0.5rem";
       errP.style.color = "var(--red)";
-      errP.textContent = `画像エラー (P${pg}): ${err.message}`;
-      img.replaceWith(errP);
+      errP.textContent = `画像エラー (P${pg}): ${r.reason?.message || r.reason}`;
+      container.appendChild(errP);
     }
-  }
+  });
+}
+
+function onCloseFullImage() {
+  document.getElementById("fullImageModal").classList.remove("active");
+}
+
+// 問題画像のラッパーをクリック → 全体表示モーダル
+async function onShowFullProblem() {
+  if (currentProblemN == null) return;
+  const modal = document.getElementById("fullImageModal");
+  const img = document.getElementById("fullImage");
+  img.src = document.getElementById("detailImage").src;  // 既にロード済みのURLを使う
+  modal.classList.add("active");
 }
 
 function onCloseAnswer() {
@@ -337,6 +372,13 @@ function wireEvents() {
   document.getElementById("closeAnswerBtn").addEventListener("click", onCloseAnswer);
   document.getElementById("answerModal").addEventListener("click", (e) => {
     if (e.target.id === "answerModal") onCloseAnswer();
+  });
+
+  // 問題画像クリックで全体表示
+  document.getElementById("problemImageWrap").addEventListener("click", onShowFullProblem);
+  document.getElementById("closeFullImageBtn").addEventListener("click", onCloseFullImage);
+  document.getElementById("fullImageModal").addEventListener("click", (e) => {
+    if (e.target.id === "fullImageModal") onCloseFullImage();
   });
 }
 
